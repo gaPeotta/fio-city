@@ -1,0 +1,11 @@
+{
+  "name": "fio-city",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Protótipo 3D de balanço físico por cabo, com cidade procedural.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142a2d">
+  <title>FIO CITY — Laboratório de movimento</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23142a2d'/%3E%3Cpath d='M8 24V8h16M8 16h11' stroke='%23dcff81' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Cidade 3D jogável. Use teclado e mouse; controles no painel de ajuda."></canvas>
+  <div id="vignette"></div>
+  <div id="speed-lines" aria-hidden="true"></div>
+  <header>
+    <div class="brand"><span class="mark">F/</span><div>FIO<span class="brand-light"> CITY</span><small>LABORATÓRIO DE MOVIMENTO</small></div></div>
+    <div class="top-right"><span class="version">PROTÓTIPO 05 <i></i> LOCAL</span><button id="sound" title="Ativar ou silenciar áudio">Áudio: off</button><button id="help-button">Ajuda <kbd>H</kbd></button><button id="tuning-button">Física <kbd>P</kbd></button></div>
+  </header>
+  <main id="welcome" class="glass">
+    <p class="eyebrow"><span></span> DISTRITO 09 / LIVRE PARA EXPLORAR</p>
+    <h1>A cidade é sua.<br><em>O impulso, também.</em></h1>
+    <p class="intro">Mire no prédio e segure o clique. Deixe o corpo acompanhar o arco. Solte para voar até a próxima fachada.</p>
+    <div class="feature-row"><span>9 quarteirões</span><b>·</b><span>1 cabo</span><b>·</b><span>Física real</span></div>
+    <button id="start" class="primary">Entrar na cidade <span>↗</span></button>
+    <p class="start-note">TECLADO + MOUSE · CLIQUE PARA CAPTURAR O CURSOR</p>
+    <div class="welcome-controls"><div><kbd>W A S D</kbd><span>Mover</span></div><div><kbd>Mouse</kbd><span>Mirar</span></div><div><kbd>Segurar clique</kbd><span>Balançar</span></div></div>
+  </main>
+  <div id="loading">Preparando o distrito…</div>
+  <div id="state-pill" class="hidden"><i></i><span>NO TELHADO</span></div>
+  <div id="reticle" class="hidden"><span></span></div>
+  <div id="anchor-marker" class="hidden"><div></div><span>ANCORAGEM</span></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <aside id="telemetry" class="glass hidden">
+    <div class="panel-heading">TELEMETRIA <span>AO VIVO</span></div>
+    <dl><div><dt>Cabo</dt><dd id="rope-value">—</dd></div><div><dt>Tensão estimada</dt><dd id="tension-value">0 N</dd></div><div><dt>Altitude</dt><dd id="altitude-value">0 m</dd></div><div><dt>Âncora</dt><dd id="anchor-value">—</dd></div><div><dt>Posição da âncora</dt><dd id="anchor-pos">—</dd></div><div><dt>Renderização</dt><dd id="fps-value">—</dd></div></dl>
+    <div class="tension-track"><div id="tension-bar"></div></div><p>Restrição unilateral · passo 120 Hz</p>
+  </aside>
+  <section id="speed-hud" class="hidden"><span class="eyebrow">VELOCIDADE</span><div><strong id="speed-value">0</strong><span>km/h</span></div><div class="speed-track"><i id="speed-bar"></i></div><p id="hint">Corra até a borda e salte para a avenida.</p></section>
+  <aside id="map-hud" class="glass hidden"><div class="panel-heading">DISTRITO 09 <span>N ↑</span></div><canvas id="minimap" width="200" height="200" aria-label="Minimapa dos nove quarteirões"></canvas><div class="map-footer"><span id="distance-value">0 m percorridos</span><span class="accent">● VOCÊ</span></div></aside>
+  <footer id="controls" class="hidden"><span><kbd>WASD</kbd> mover</span><span><kbd>Espaço</kbd> saltar</span><span><kbd>CLIQUE</kbd> segurar cabo</span><span><kbd>E</kbd> alternar cabo</span><span><kbd>Mouse</kbd> mirar</span><span><kbd>Shift</kbd> correr / mergulhar</span><button id="reset">Recomeçar <kbd>0</kbd></button></footer>
+  <section id="help" class="dialog glass hidden" role="dialog" aria-labelledby="help-title"><button class="close" data-close="help" aria-label="Fechar ajuda">×</button><p class="eyebrow">GUIA DE CAMPO</p><h2 id="help-title">Aprenda a ler o arco.</h2><p>Mire numa fachada e segure o clique para balançar. Solte para voar. No chão, uma puxada inicial automática levanta o personagem. No ar, basta segurar. A âncora permanece no ponto escolhido até você soltar; você não precisa encurtar nem alongar. Quando o cabo encontra uma quina, ele a contorna sem mudar a âncora.</p><div class="help-grid"><div><kbd>Mouse / ← → ↑ ↓</kbd><span>Orientar e conduzir o arco</span></div><div><kbd>W A S D</kbd><span>Mover / dirigir o arco com a teia</span></div><div><kbd>Espaço</kbd><span>Saltar do chão ou da parede</span></div><div><kbd>Segurar clique / E</kbd><span>Prender; soltar clique ou E libera</span></div><div><kbd>Shift</kbd><span>Sprint no chão / mergulho no ar</span></div><div><kbd>F</kbd><span>Zip curto, com carga e recarga</span></div><div><kbd>C + WASD</kbd><span>Parede: subir ou correr lateralmente</span></div><div><kbd>X</kbd><span>Mortal manual; mortais automáticos na soltura</span></div><div><kbd>1 / 2 / 3 / 4</kbd><span>Cenários de teste</span></div><div><kbd>Esc / H / P</kbd><span>Pausar / ajuda / ajustes de física</span></div><div><kbd>0 / V</kbd><span>Reiniciar / mostrar telemetria</span></div></div><p class="tip">Comece correndo para a avenida. Prenda acima e à frente, mergulhe e solte perto do ponto mais baixo. Vire a câmera para conduzir o arco, ou use WASD: olhando para o prédio, S afasta, A/D desviam e W aproxima. Seus comandos têm prioridade sobre a ajuda automática.</p><button class="primary" data-close="help">Continuar <span>↗</span></button></section>
+  <section id="tuning" class="dialog glass hidden" role="dialog" aria-labelledby="tuning-title"><button class="close" data-close="tuning" aria-label="Fechar ajustes">×</button><p class="eyebrow">BANCADA DE FÍSICA</p><h2 id="tuning-title">Ajuste o seu balanço.</h2><p>A ajuda no balanço é suave e limitada a 32 m/s. A saída do chão usa uma puxada automática curta. No ar, o comprimento fica fixo. Use Física sem assistência para desligar as ajudas.</p><div id="sliders"></div><div class="preset-row"><button id="physical-preset">Física sem assistência</button><button id="default-preset">Restaurar padrão</button></div><label class="setting">Qualidade gráfica <select id="quality"><option value="high">Alta</option><option value="low">Leve</option></select></label><label class="setting">Cenário <select id="scenario"></select></label><button class="primary" data-close="tuning">Voltar à cidade <span>↗</span></button></section>
+  <div id="pause" class="glass hidden"><p class="eyebrow">SIMULAÇÃO PAUSADA</p><h2>Respire. Escolha o próximo prédio.</h2><button id="resume" class="primary">Continuar <span>↗</span></button><p>Esc libera o cursor. Clique para retomar.</p></div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
